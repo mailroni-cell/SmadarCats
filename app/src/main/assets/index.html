@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>החתולים של סמדר</title>
+  <meta name="theme-color" content="#F29F67" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="החתולים של סמדר" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: 'Rubik', sans-serif;
+      background-color: #FFFBF5;
+      color: #4E342E;
+      font-size: 18px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    body.dark-mode {
+      background-color: #1F1918;
+      color: #F7EDE8;
+    }
+    .paw-bg {
+      background-image: radial-gradient(#F29F6722 2px, transparent 2px);
+      background-size: 28px 28px;
+    }
+    .card-soft {
+      background: #FFFFFF;
+      border: 2px solid #FDE8D7;
+      border-radius: 24px;
+      box-shadow: 0 6px 20px rgba(78, 52, 46, 0.06);
+    }
+    body.dark-mode .card-soft {
+      background: #2C2321;
+      border-color: #453532;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+    .btn-touch {
+      min-height: 54px;
+      border-radius: 18px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+      cursor: pointer;
+    }
+    .btn-touch:active {
+      transform: scale(0.97);
+    }
+    .cat-ears {
+      position: relative;
+    }
+    .cat-ears::before, .cat-ears::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 16px solid #F29F67;
+    }
+    .cat-ears::before { right: 24px; }
+    .cat-ears::after { left: 24px; }
+    .flashlight-overlay {
+      position: fixed;
+      inset: 0;
+      background: #FFFFFF;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      color: #4E342E;
+    }
+    .flashlight-overlay.active { display: flex; }
+  </style>
+</head>
+<body class="paw-bg pb-36">
+
+  <!-- Flashlight Overlay -->
+  <div id="flashlightOverlay" class="flashlight-overlay">
+    <div class="text-6xl mb-4">🔦</div>
+    <h2 class="text-2xl font-extrabold mb-2">פנס שטח פעיל</h2>
+    <p class="text-lg mb-8">המסך מואר בעוצמה מלאה להאכלת ערב</p>
+    <button onclick="toggleFlashlight()" class="btn-touch bg-[#F29F67] text-white px-8 py-4 text-xl shadow-lg">
+      כיבוי פנס וחזרה לאפליקציה
+    </button>
+  </div>
+
+  <!-- Sticky Full-Width Header -->
+  <header class="sticky top-0 z-40 bg-[#FFFBF5]/95 dark:bg-[#1F1918]/95 backdrop-blur-md border-b-2 border-[#FDE8D7] px-4 pt-3 pb-3 shadow-sm">
+    <div class="max-w-xl mx-auto flex flex-col gap-3">
+      <!-- Row 1: Brand & Theme -->
+      <div class="flex items-center justify-between gap-2 w-full">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-2xl bg-[#FDE8D7] border-2 border-[#F29F67] flex items-center justify-center shrink-0 text-2xl">
+            🐱
+          </div>
+          <div class="flex flex-col">
+            <h1 class="text-xl font-extrabold leading-tight text-[#4E342E]" id="appTitle">החתולים של סמדר</h1>
+            <span class="text-sm font-medium text-[#8D6E63]">ניהול האכלה חכם באהבה 🐾</span>
+          </div>
+        </div>
+        <button onclick="toggleDarkMode()" class="btn-touch px-3 bg-[#FDE8D7] text-[#4E342E] shrink-0" title="מצב יום/לילה">
+          <span id="themeIcon" class="text-xl">🌙</span>
+        </button>
+      </div>
+
+      <!-- Row 2: 4 Equal Action Buttons (Never overflows) -->
+      <div class="grid grid-cols-4 gap-2 w-full">
+        <button onclick="openModal('installModal')" class="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-[#F29F67] text-white font-bold text-sm shadow-sm active:scale-95">
+          <span class="text-lg">📲</span>
+          <span>התקנה</span>
+        </button>
+        <button onclick="openSitterShare()" class="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-[#E8F8F0] border border-[#81C784] text-[#2E7D32] font-bold text-sm active:scale-95">
+          <span class="text-lg">💬</span>
+          <span>מחליפה</span>
+        </button>
+        <button onclick="speakSummary()" class="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-[#FCE4EC] border border-[#F7B7C8] text-[#880E4F] font-bold text-sm active:scale-95">
+          <span class="text-lg">🗣️</span>
+          <span>הקראה</span>
+        </button>
+        <button onclick="toggleFlashlight()" class="flex flex-col items-center justify-center py-2 px-1 rounded-2xl bg-[#FFF3E0] border border-[#FFCC80] text-[#E65100] font-bold text-sm active:scale-95">
+          <span class="text-lg">🔦</span>
+          <span>פנס</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Guide & Backup Bar -->
+  <div class="bg-[#FCE4EC]/80 border-b border-[#F7B7C8] px-4 py-2.5">
+    <div class="max-w-xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <button onclick="openGuideModal()" class="flex-1 min-w-[180px] py-2.5 px-4 rounded-2xl bg-[#F48FB1] text-white font-bold text-base flex items-center justify-center gap-2 shadow-sm active:scale-95">
+        <span>🐾</span>
+        <span>איך משתמשים במסך הזה?</span>
+      </button>
+      <button onclick="openModal('backupModal')" class="py-2.5 px-4 rounded-2xl bg-white border border-[#F7B7C8] text-[#4E342E] font-bold text-base flex items-center justify-center gap-1.5 active:scale-95">
+        <span>⚙️</span>
+        <span>גיבוי</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main id="mainContent" class="max-w-xl mx-auto px-4 pt-4 flex flex-col gap-4"></main>
+
+  <!-- Bottom Navigation Bar (5 Equal Columns, Clear Labels) -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#FFFBF5]/95 dark:bg-[#1F1918]/95 backdrop-blur-md border-t-2 border-[#FDE8D7] px-2 pt-2 pb-4 shadow-lg">
+    <div class="max-w-xl mx-auto grid grid-cols-5 gap-1">
+      <button onclick="switchTab('feeding')" id="nav-feeding" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl font-bold text-sm">
+        <span class="text-2xl mb-0.5">🍲</span>
+        <span>האכלה</span>
+      </button>
+      <button onclick="switchTab('reminders')" id="nav-reminders" class="nav-btn relative flex flex-col items-center justify-center py-1.5 rounded-2xl font-bold text-sm">
+        <span id="reminderBadge" class="absolute top-0.5 right-2 bg-[#E53935] text-white text-xs font-extrabold px-1.5 rounded-full">2</span>
+        <span class="text-2xl mb-0.5">⏰</span>
+        <span>תזכורות</span>
+      </button>
+      <button onclick="switchTab('cats')" id="nav-cats" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl font-bold text-sm">
+        <span class="text-xs font-extrabold text-[#D84315] leading-none mb-0.5">חתולים</span>
+        <span class="text-2xl">🐱</span>
+      </button>
+      <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl font-bold text-sm">
+        <span class="text-2xl mb-0.5">🛍️</span>
+        <span>מלאי</span>
+      </button>
+      <button onclick="switchTab('vet')" id="nav-vet" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl font-bold text-sm">
+        <span class="text-2xl mb-0.5">🩺</span>
+        <span>יועץ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Modal Backdrop -->
+  <div id="modalContainer" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs hidden items-end sm:items-center justify-center p-3">
+    <div id="modalBody" class="w-full max-w-lg bg-[#FFFBF5] text-[#4E342E] rounded-3xl border-2 border-[#F29F67] p-5 max-h-[82vh] overflow-y-auto pb-24 shadow-2xl"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-[#4E342E] text-white px-5 py-3 rounded-2xl font-bold text-base shadow-xl hidden text-center max-w-[90vw]"></div>
+
+  <script>
+    const STORAGE_KEY = 'smadar_cats_v5';
+
+    const defaultState = {
+      activeTab: 'feeding',
+      selectedCity: 'הכל',
+      darkMode: false,
+      inventory: {
+        dryKg: 11.5,
+        bagSizeKg: 15,
+        cans: 16
+      },
+      spots: [
+        {
+          id: 1,
+          city: 'נתניה',
+          name: 'חצר בניין 12 (דוגמה)',
+          icon: '🏢',
+          time: '07:00',
+          days: 'כל יום',
+          dryCups: 2.5,
+          cans: 2,
+          fedToday: true,
+          note: 'להניח ליד השיח מימין, לשים מים טריים',
+          isDemo: true
+        },
+        {
+          id: 2,
+          city: 'נתניה',
+          name: 'גינת הכרמל (דוגמה)',
+          icon: '🌳',
+          time: '18:30',
+          days: 'א׳-ו׳',
+          dryCups: 3,
+          cans: 2,
+          fedToday: false,
+          note: 'מגיעים 6 חתולים קבועים',
+          isDemo: true
+        },
+        {
+          id: 3,
+          city: 'הרצליה',
+          name: 'חניון הצפון (דוגמה)',
+          icon: '🅿️',
+          time: '20:00',
+          days: 'כל יום',
+          dryCups: 2,
+          cans: 1,
+          fedToday: false,
+          note: 'להאכיל בפינה השקטה רחוק מהכביש',
+          isDemo: true
+        }
+      ],
+      cats: [
+        {
+          id: 101,
+          name: 'ג׳ינג׳י (דוגמה)',
+          spotName: 'חצר בניין 12',
+          photo: '',
+          emoji: '🐈',
+          tags: ['✂️ אוזן קטומה (מעוקר)', '😻 חברותי ומתלטף'],
+          note: 'אוהב אוכל רטוב בטעם טונה',
+          isDemo: true
+        },
+        {
+          id: 102,
+          name: 'לולה (דוגמה)',
+          spotName: 'גינת הכרמל',
+          photo: '',
+          emoji: '🐈‍⬛',
+          tags: ['⚠️ דורש עיקור', '👀 חששן / מרחוק'],
+          note: 'לתאם לכידה לעיקור השבוע',
+          isDemo: true
+        }
+      ],
+      reminders: [
+        {
+          id: 201,
+          title: 'לקחת את מיצי לווטרינר (דוגמה)',
+          when: 'מחר • 09:30',
+          note: 'בדיקת אוזן שגרתית',
+          done: false,
+          icon: '🩺',
+          isDemo: true
+        },
+        {
+          id: 202,
+          title: 'לתאם עיקור ללולה (דוגמה)',
+          when: 'בעוד יומיים • 10:00',
+          note: 'להתקשר למרפאה העירונית',
+          done: false,
+          icon: '✂️',
+          isDemo: true
+        }
+      ],
+      happyMoments: [
+        'ג׳ינג׳י בא להתחכך ברגליים וגרגר חזק היום בבוקר 😻',
+        'כל החבורה בגינת הכרמל חיכתה מסודרת בשורה ליד הקערות 🐾'
+      ]
+    };
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return { ...defaultState, ...JSON.parse(saved) };
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        showToast('האחסון מלא – מומלץ להוריד קובץ גיבוי');
+      }
+      updateBadges();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => t.classList.add('hidden'), 3200);
+    }
+
+    function playMeow() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(780, ctx.currentTime + 0.14);
+        osc.frequency.exponentialRampToValueAtTime(380, ctx.currentTime + 0.42);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.46);
+      } catch (e) {}
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast('הקראה קולית אינה נתמכת בדפדפן זה');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'he-IL';
+      utter.rate = 0.95;
+      window.speechSynthesis.speak(utter);
+      showToast('🗣️ מקריא בקול...');
+    }
+
+    function speakSummary() {
+      const pending = state.spots.filter(s => !s.fedToday);
+      if (pending.length === 0) {
+        speakText('כל הכבוד סמדר! האכלת היום את כל המקומות.');
+      } else {
+        const next = pending[0];
+        speakText(`היי סמדר, נותרו ${pending.length} מקומות להאכלה. המקום הבא הוא ${next.name} ב${next.city} בשעה ${next.time}, יש לשים ${next.dryCups} כוסות אוכל יבש ו-${next.cans} שימורים.`);
+      }
+    }
+
+    function toggleDarkMode() {
+      state.darkMode = !state.darkMode;
+      document.body.classList.toggle('dark-mode', state.darkMode);
+      document.getElementById('themeIcon').textContent = state.darkMode ? '☀️' : '🌙';
+      saveState();
+    }
+
+    function toggleFlashlight() {
+      document.getElementById('flashlightOverlay').classList.toggle('active');
+    }
+
+    function updateBadges() {
+      const openReminders = state.reminders.filter(r => !r.done).length;
+      const badge = document.getElementById('reminderBadge');
+      if (openReminders > 0) {
+        badge.textContent = openReminders;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function switchTab(tab) {
+      state.activeTab = tab;
+      saveState();
+      render();
+    }
+
+    function render() {
+      if (state.darkMode) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('themeIcon').textContent = '☀️';
+      }
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-[#FDE8D7]', 'text-[#D84315]');
+      });
+      const activeBtn = document.getElementById('nav-' + state.activeTab);
+      if (activeBtn) activeBtn.classList.add('bg-[#FDE8D7]', 'text-[#D84315]');
+
+      const main = document.getElementById('mainContent');
+      if (state.activeTab === 'feeding') renderFeeding(main);
+      else if (state.activeTab === 'reminders') renderReminders(main);
+      else if (state.activeTab === 'cats') renderCats(main);
+      else if (state.activeTab === 'inventory') renderInventory(main);
+      else if (state.activeTab === 'vet') renderVet(main);
+      updateBadges();
+    }
+
+    function renderFeeding(main) {
+      const total = state.spots.length;
+      const fed = state.spots.filter(s => s.fedToday).length;
+      const pct = total ? Math.round((fed / total) * 100) : 0;
+      const nextSpot = state.spots.find(s => !s.fedToday);
+      const cities = ['הכל', ...new Set(state.spots.map(s => s.city))];
+
+      const filteredSpots = state.selectedCity === 'הכל'
+        ? state.spots
+        : state.spots.filter(s => s.city === state.selectedCity);
+
+      main.innerHTML = `
+        <!-- Greeting & Progress Card (Vertical Full-Width Layout) -->
+        <section class="card-soft p-5 flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-2xl font-extrabold">היי סמדר היקרה! 🐾</h2>
+            <span class="px-3 py-1 rounded-xl bg-[#FDE8D7] text-[#D84315] font-extrabold text-lg">${pct}%</span>
+          </div>
+          <p class="text-lg font-medium">האכלת היום <strong>${fed}</strong> מתוך <strong>${total}</strong> מקומות</p>
+          <div class="w-full h-4 bg-[#FDE8D7] rounded-full overflow-hidden">
+            <div class="h-full bg-gradient-to-l from-[#F29F67] to-[#F48FB1] rounded-full transition-all" style="width:${pct}%"></div>
+          </div>
+          ${nextSpot ? `
+            <div class="mt-1 p-3.5 rounded-2xl bg-[#FFF3E0] border border-[#FFCC80] flex flex-col gap-2">
+              <div class="font-bold text-base text-[#E65100]">⏰ הבא בתור: ${nextSpot.city} - ${nextSpot.name} (${nextSpot.time})</div>
+              <button onclick="triggerReminderDemo(${nextSpot.id})" class="btn-touch w-full bg-[#F29F67] text-white text-lg">
+                <span>🔔</span>
+                <span>בדוק התראת האכלה</span>
+              </button>
+            </div>
+          ` : `
+            <div class="mt-1 p-3.5 rounded-2xl bg-[#E8F8F0] border border-[#81C784] text-[#2E7D32] font-bold text-lg text-center">
+              🎉 כל המקומות הואכלו להיום! כל הכבוד!
+            </div>
+          `}
+        </section>
+
+        <!-- City Filter Pills -->
+        <div class="flex flex-wrap gap-2">
+          ${cities.map(c => `
+            <button onclick="setCityFilter('${c}')" class="px-4 py-2.5 rounded-2xl font-bold text-base border-2 ${state.selectedCity === c ? 'bg-[#F29F67] text-white border-[#F29F67]' : 'bg-white text-[#4E342E] border-[#FDE8D7]'}">
+              ${c === 'הכל' ? '🐾 כל המקומות' : '🏙️ ' + c}
+            </button>
+          `).join('')}
+        </div>
+
+        <!-- Add Spot & Clear Demo Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="openAddSpotModal()" class="btn-touch bg-[#F29F67] text-white text-base px-3 shadow-sm">
+            <span>➕ מקום חדש (3 לחיצות)</span>
+          </button>
+          <button onclick="clearDemoData()" class="btn-touch bg-white border-2 border-[#F7B7C8] text-[#880E4F] text-base px-3">
+            <span>🧹 נקה דוגמאות</span>
+          </button>
+        </div>
+
+        <!-- Feeding Spots List (Clean Vertical Cards - Zero Clipping) -->
+        <div class="flex flex-col gap-5 mt-1">
+          ${filteredSpots.length === 0 ? `
+            <div class="card-soft p-6 text-center text-lg">
+              אין מקומות ברשימה כרגע. לחצי על <strong>"➕ מקום חדש"</strong> כדי להוסיף את המקום הראשון!
+            </div>
+          ` : filteredSpots.map(spot => `
+            <article class="card-soft p-5 flex flex-col gap-3 ${!spot.fedToday ? 'cat-ears mt-2' : 'opacity-90'}">
+              <!-- Top Action Bar -->
+              <div class="flex items-center justify-between gap-2 border-b border-[#FDE8D7] pb-2.5">
+                <span class="px-3 py-1 rounded-xl font-bold text-sm ${spot.fedToday ? 'bg-[#E8F8F0] text-[#2E7D32]' : 'bg-[#FFF3E0] text-[#E65100]'}">
+                  ${spot.fedToday ? '✅ הואכל היום' : '⏳ ממתין להאכלה'}
+                </span>
+                <div class="flex items-center gap-2">
+                  <button onclick="speakSpot(${spot.id})" class="w-11 h-11 rounded-xl bg-[#FCE4EC] text-lg flex items-center justify-center" title="הקראה">🗣️</button>
+                  <button onclick="openEditSpotModal(${spot.id})" class="w-11 h-11 rounded-xl bg-[#FDE8D7] text-lg flex items-center justify-center" title="עריכת כמויות">⚙️</button>
+                  <button onclick="deleteSpot(${spot.id})" class="w-11 h-11 rounded-xl bg-[#FFEBEE] text-lg flex items-center justify-center" title="מחיקה">🗑️</button>
+                </div>
+              </div>
+
+              <!-- Full-Width Title & City -->
+              <div class="flex flex-col gap-1">
+                <div class="text-sm font-bold text-[#D84315]">🏙️ ${spot.city} • ⏰ ${spot.time} (${spot.days})</div>
+                <h3 class="text-2xl font-extrabold leading-snug">${spot.icon} ${spot.name}</h3>
+              </div>
+
+              <!-- Portion Info Box -->
+              <div class="p-3 rounded-2xl bg-[#FFFBF5] border border-[#FDE8D7] flex flex-col gap-1">
+                <div class="font-bold text-base">🥣 מנה קבועה: ${spot.dryCups} כוסות יבש (${Math.round(spot.dryCups * 100)} גר׳) + ${spot.cans} שימורים</div>
+                ${spot.note ? `<div class="text-base text-[#6D4C41]">📝 ${spot.note}</div>` : ''}
+              </div>
+
+              <!-- Full-Width Action Buttons -->
+              <div class="flex flex-col gap-2 pt-1">
+                <button onclick="toggleFeedSpot(${spot.id})" class="btn-touch w-full text-xl ${spot.fedToday ? 'bg-[#E8F8F0] border-2 border-[#81C784] text-[#2E7D32]' : 'bg-[#F29F67] text-white shadow-md'}">
+                  <span>${spot.fedToday ? '↩️ בטל סימון האכלה' : '🐾 האכלתי! (לחיצה אחת)'}</span>
+                </button>
+                ${!spot.fedToday ? `
+                  <button onclick="openCustomFeedModal(${spot.id})" class="btn-touch w-full bg-white border-2 border-[#FDE8D7] text-[#4E342E] text-base">
+                    <span>⚖️ שינוי כמות להיום (חצי / כפול)</span>
+                  </button>
+                ` : ''}
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderReminders(main) {
+      main.innerHTML = `
+        <section class="card-soft p-5 flex flex-col gap-3">
+          <h2 class="text-2xl font-extrabold">⏰ תזכורות ומשימות</h2>
+          <p class="text-base">הוסיפי תזכורת לווטרינר, עיקור או הזמנת אוכל בלחיצה אחת:</p>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="quickAddReminder('✂️ לתאם עיקור/סירוס', 'מחר • 09:00', 'להתקשר למרפאה העירונית')" class="btn-touch bg-[#FCE4EC] border border-[#F7B7C8] text-[#880E4F] text-base px-2">✂️ תור לעיקור</button>
+            <button onclick="quickAddReminder('🩺 בדיקה אצל וטרינר', 'מחר • 10:30', 'לקחת מנשא מהמחסן')" class="btn-touch bg-[#FFF3E0] border border-[#FFCC80] text-[#E65100] text-base px-2">🩺 וטרינר</button>
+            <button onclick="quickAddReminder('💊 לתת תרופה באוכל הרטוב', 'היום • בערב', 'לערבב בפאוצ׳ טונה')" class="btn-touch bg-[#E8F8F0] border border-[#81C784] text-[#2E7D32] text-base px-2">💊 תרופה באוכל</button>
+            <button onclick="quickAddReminder('🛍️ להזמין שק אוכל יבש', 'היום • 17:00', 'שק 15 ק״ג לחתולי רחוב')" class="btn-touch bg-[#FDE8D7] border border-[#F29F67] text-[#4E342E] text-base px-2">🛍️ הזמנת שק</button>
+          </div>
+          <button onclick="openCustomReminderModal()" class="btn-touch w-full bg-[#F29F67] text-white text-lg mt-1">
+            ➕ תזכורת מותאמת אישית
+          </button>
+        </section>
+
+        <div class="flex flex-col gap-4">
+          ${state.reminders.map(r => `
+            <article class="card-soft p-5 flex flex-col gap-3 ${r.done ? 'opacity-60' : ''}">
+              <div class="flex items-center justify-between gap-2 border-b border-[#FDE8D7] pb-2">
+                <span class="px-3 py-1 rounded-xl bg-[#FFF3E0] text-[#E65100] font-bold text-sm">⏰ ${r.when}</span>
+                <div class="flex items-center gap-2">
+                  <button onclick="speakText('${r.title}. ${r.note}')" class="w-11 h-11 rounded-xl bg-[#FCE4EC] text-lg flex items-center justify-center">🗣️</button>
+                  <button onclick="deleteReminder(${r.id})" class="w-11 h-11 rounded-xl bg-[#FFEBEE] text-lg flex items-center justify-center">🗑️</button>
+                </div>
+              </div>
+              <h3 class="text-xl font-extrabold leading-snug ${r.done ? 'line-through' : ''}">${r.icon} ${r.title}</h3>
+              ${r.note ? `<p class="text-base text-[#6D4C41]">📝 ${r.note}</p>` : ''}
+              <button onclick="toggleReminder(${r.id})" class="btn-touch w-full text-lg ${r.done ? 'bg-[#E8F8F0] text-[#2E7D32]' : 'bg-[#F29F67] text-white'}">
+                ${r.done ? '✅ בוצע! (לחצי לביטול)' : '✔️ סמני שבוצע'}
+              </button>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderCats(main) {
+      main.innerHTML = `
+        <section class="card-soft p-5 flex flex-col gap-3">
+          <h2 class="text-2xl font-extrabold">🐱 החתולים שלי בשטח</h2>
+          <p class="text-base">צלמי כל חתול בטלפון וסמני מאפיינים בלחיצה כדי לזכור מי מעוקר ומי צריך טיפול.</p>
+          <button onclick="openAddCatModal()" class="btn-touch w-full bg-[#F29F67] text-white text-lg">
+            📸 הוסף חתול חדש + צילום תמונה
+          </button>
+        </section>
+
+        <div class="flex flex-col gap-4">
+          ${state.cats.map(cat => `
+            <article class="card-soft p-5 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2 border-b border-[#FDE8D7] pb-2">
+                <span class="px-3 py-1 rounded-xl bg-[#FDE8D7] text-[#4E342E] font-bold text-sm">📍 ${cat.spotName}</span>
+                <div class="flex items-center gap-2">
+                  <label class="w-11 h-11 rounded-xl bg-[#FCE4EC] text-lg flex items-center justify-center cursor-pointer" title="צלם/החלף תמונה">
+                    📸
+                    <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handleCatPhotoUpload(event, ${cat.id})" />
+                  </label>
+                  <button onclick="deleteCat(${cat.id})" class="w-11 h-11 rounded-xl bg-[#FFEBEE] text-lg flex items-center justify-center">🗑️</button>
+                </div>
+              </div>
+
+              <!-- Cat Photo & Name Full Width -->
+              <div class="flex items-center gap-4">
+                ${cat.photo ? `
+                  <img src="${cat.photo}" alt="${cat.name}" class="w-24 h-24 rounded-2xl object-cover border-2 border-[#F29F67] shrink-0" />
+                ` : `
+                  <div class="w-24 h-24 rounded-2xl bg-[#FDE8D7] border-2 border-[#F29F67] flex items-center justify-center text-5xl shrink-0">
+                    ${cat.emoji || '🐱'}
+                  </div>
+                `}
+                <div class="flex flex-col gap-1">
+                  <h3 class="text-2xl font-extrabold leading-tight">${cat.name}</h3>
+                  ${cat.note ? `<p class="text-base text-[#6D4C41]">${cat.note}</p>` : ''}
+                </div>
+              </div>
+
+              <!-- Feature Tags -->
+              <div class="flex flex-wrap gap-2 pt-1">
+                ${(cat.tags || []).map(tag => `
+                  <span class="px-3 py-1.5 rounded-xl bg-[#FFF3E0] border border-[#FFCC80] text-[#4E342E] font-bold text-sm">
+                    ${tag}
+                  </span>
+                `).join('')}
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderInventory(main) {
+      const pct = Math.min(100, Math.round((state.inventory.dryKg / state.inventory.bagSizeKg) * 100));
+      const daysLeft = Math.max(1, Math.round(state.inventory.dryKg / 0.8));
+
+      main.innerHTML = `
+        <!-- Dry Food Card (Full Width Vertical Stack) -->
+        <section class="card-soft p-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-extrabold">🛍️ שק אוכל יבש בבית</h2>
+            <span class="px-3 py-1 rounded-xl bg-[#F29F67] text-white font-extrabold text-lg">${pct}%</span>
+          </div>
+
+          <div class="w-full h-5 bg-[#FDE8D7] rounded-full overflow-hidden">
+            <div class="h-full bg-[#F29F67] rounded-full" style="width:${pct}%"></div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#FFFBF5] border border-[#FDE8D7] flex flex-col gap-1">
+            <div class="text-xl font-extrabold text-[#D84315]">נותרו ${state.inventory.dryKg.toFixed(1)} ק״ג בשק</div>
+            <div class="text-base font-medium">יספיק לכ-${daysLeft} ימי האכלה בקצב הנוכחי</div>
+          </div>
+
+          <button onclick="addDryBag(15)" class="btn-touch w-full bg-[#F29F67] text-white text-lg shadow-sm">
+            ➕ הוסף שק חדש של 15 ק״ג
+          </button>
+        </section>
+
+        <!-- Wet Food Cans Card (Full Width Vertical Stack) -->
+        <section class="card-soft p-5 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-extrabold">🥫 שימורים ופאוצ׳ים</h2>
+            <span class="text-3xl">🥫</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#FFFBF5] border border-[#FDE8D7]">
+            <div class="text-xl font-extrabold text-[#2E7D32]">נותרו ${state.inventory.cans} יחידות במלאי</div>
+            <div class="text-base text-[#6D4C41]">מופחת אוטומטית בכל דיווח האכלה</div>
+          </div>
+
+          <button onclick="addCans(24)" class="btn-touch w-full bg-white border-2 border-[#F29F67] text-[#4E342E] text-lg">
+            ➕ הוסף ארגז שימורים (24 יח׳)
+          </button>
+        </section>
+      `;
+    }
+
+    function renderVet(main) {
+      main.innerHTML = `
+        <!-- Emergency by Location -->
+        <section class="card-soft p-5 flex flex-col gap-3 border-2 border-[#EF9A9A]">
+          <h2 class="text-2xl font-extrabold text-[#C62828]">🚨 חירום ווטרינר תורן</h2>
+          <p class="text-base">מצאת חתול פצוע או במצוקה? פני מיד למוקד העירוני או למרפאת חירום 24/7:</p>
+          <div class="grid grid-cols-1 gap-2.5">
+            <a href="tel:106" class="btn-touch w-full bg-[#E53935] text-white text-lg no-underline">
+              📞 חיוג מהיר למוקד העירוני 106
+            </a>
+            <button onclick="showVetAdvice('פציעה או דימום', 'שמרי על מרחק בטוח, כסי את החתול במגבת עבה בעדינות והכניסי למנשא סגור במקום חשוך ושקט בדרך למרפאה.')" class="btn-touch w-full bg-[#FFEBEE] text-[#C62828] text-base">
+              🩹 הנחיות עזרה ראשונה לחתול פצוע
+            </button>
+          </div>
+        </section>
+
+        <!-- Symptom Checker -->
+        <section class="card-soft p-5 flex flex-col gap-3">
+          <h2 class="text-2xl font-extrabold">🩺 בדיקת תסמינים בשטח</h2>
+          <p class="text-base">לחצי על התופעה שזיהית לקבלת הסבר והמלצה:</p>
+          <div class="flex flex-col gap-2.5">
+            <button onclick="showVetAdvice('לא אוכל ומסתתר', 'חתול רחוב שפתאום לא ניגש לאוכל ומסתתר בפינה עלול לסבול מכאב שיניים, חום או דלקת. בדקי אם יש ריור מהפה ותאמי בדיקת וטרינר.')" class="btn-touch w-full bg-[#FFF3E0] text-[#4E342E] text-base justify-start px-4">
+              😿 לא אוכל / מסתתר בפינה
+            </button>
+            <button onclick="showVetAdvice('התעטשויות והפרשות בעיניים', 'נפוץ מאוד בחתולי רחוב (הרפס חתולים / קליצי). כדאי לנקות בעדינות עם צמר גפן טבול במים פושרים ולהתייעץ עם וטרינר לגבי משחת עיניים.')" class="btn-touch w-full bg-[#FFF3E0] text-[#4E342E] text-base justify-start px-4">
+              🤧 מתעטש / הפרשות מהעיניים
+            </button>
+            <button onclick="showVetAdvice('צליעה או קושי בהליכה', 'אם החתול דורך חלקית ואין דימום, עקבי 24 שעות. אם הרגל באוויר או נפוחה מאוד – נדרש צילום וטרינרי.')" class="btn-touch w-full bg-[#FFF3E0] text-[#4E342E] text-base justify-start px-4">
+              🐾 צולע או גורר רגל
+            </button>
+          </div>
+          <div id="vetAdviceBox" class="hidden p-4 rounded-2xl bg-[#E8F8F0] border border-[#81C784] text-[#1B5E20] text-base"></div>
+        </section>
+
+        <!-- Happy Corner -->
+        <section class="card-soft p-5 flex flex-col gap-3 bg-[#FCE4EC]/40">
+          <h2 class="text-2xl font-extrabold">😻 פינת הרגעים השמחים</h2>
+          <p class="text-base">מצמוץ איטי מחתול = נשיקה של אמון ואהבה!</p>
+          <div class="flex flex-col gap-2">
+            ${state.happyMoments.map(m => `
+              <div class="p-3 rounded-2xl bg-white border border-[#F7B7C8] text-base font-medium">${m}</div>
+            `).join('')}
+          </div>
+          <button onclick="addHappyMoment()" class="btn-touch w-full bg-[#F48FB1] text-white text-base">
+            ✨ הוסף רגע שמח מהיום
+          </button>
+        </section>
+      `;
+    }
+
+    function setCityFilter(city) {
+      state.selectedCity = city;
+      render();
+    }
+
+    function toggleFeedSpot(id) {
+      const spot = state.spots.find(s => s.id === id);
+      if (!spot) return;
+      spot.fedToday = !spot.fedToday;
+      const kgUsed = spot.dryCups * 0.1;
+      if (spot.fedToday) {
+        state.inventory.dryKg = Math.max(0, state.inventory.dryKg - kgUsed);
+        state.inventory.cans = Math.max(0, state.inventory.cans - spot.cans);
+        playMeow();
+        showToast(`מיאו! תודה סמדר, עודכן שבוצע ב${spot.name} 🐾`);
+      } else {
+        state.inventory.dryKg += kgUsed;
+        state.inventory.cans += spot.cans;
+        showToast('הסימון בוטל והמלאי הוחזר');
+      }
+      saveState();
+      render();
+    }
+
+    function openCustomFeedModal(id) {
+      const spot = state.spots.find(s => s.id === id);
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">⚖️ שינוי כמות להיום</h3>
+        <p class="text-base mb-4">בחרי כמות עבור <strong>${spot.name}</strong>:</p>
+        <div class="flex flex-col gap-3">
+          <button onclick="applyCustomFeed(${id}, 0.5)" class="btn-touch w-full bg-[#FFF3E0] text-[#4E342E] text-lg">🥣 חצי מנה (${spot.dryCups * 0.5} כוסות)</button>
+          <button onclick="applyCustomFeed(${id}, 1)" class="btn-touch w-full bg-[#F29F67] text-white text-lg">🍲 מנה רגילה (${spot.dryCups} כוסות)</button>
+          <button onclick="applyCustomFeed(${id}, 1.5)" class="btn-touch w-full bg-[#FCE4EC] text-[#880E4F] text-lg">⛰️ מנה מוגדלת (${spot.dryCups * 1.5} כוסות)</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base mt-2">ביטול</button>
+        </div>
+      `);
+    }
+
+    function applyCustomFeed(id, multiplier) {
+      const spot = state.spots.find(s => s.id === id);
+      spot.fedToday = true;
+      state.inventory.dryKg = Math.max(0, state.inventory.dryKg - (spot.dryCups * multiplier * 0.1));
+      state.inventory.cans = Math.max(0, state.inventory.cans - Math.round(spot.cans * multiplier));
+      playMeow();
+      closeModal();
+      saveState();
+      render();
+      showToast('האכלה עודכנה בהצלחה! 🐾');
+    }
+
+    function openAddSpotModal() {
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">➕ הוספת מקום חדש</h3>
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="font-bold text-base block mb-1.5">1. באיזו עיר?</label>
+            <div class="grid grid-cols-3 gap-2 mb-2">
+              <button type="button" onclick="document.getElementById('newSpotCity').value='נתניה'" class="py-2.5 rounded-xl bg-[#FDE8D7] font-bold text-base">נתניה</button>
+              <button type="button" onclick="document.getElementById('newSpotCity').value='תל אביב'" class="py-2.5 rounded-xl bg-[#FDE8D7] font-bold text-base">תל אביב</button>
+              <button type="button" onclick="document.getElementById('newSpotCity').value='הרצליה'" class="py-2.5 rounded-xl bg-[#FDE8D7] font-bold text-base">הרצליה</button>
+            </div>
+            <input id="newSpotCity" type="text" value="נתניה" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" placeholder="או הקלידי שם עיר..." />
+          </div>
+
+          <div>
+            <label class="font-bold text-base block mb-1.5">2. סוג המקום (לחיצה למילוי מהיר):</label>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <button type="button" onclick="setSpotPreset('🌳','גינה ציבורית')" class="py-2.5 px-2 rounded-xl bg-[#FFF3E0] font-bold text-base">🌳 גינה ציבורית</button>
+              <button type="button" onclick="setSpotPreset('🏢','חצר בניין')" class="py-2.5 px-2 rounded-xl bg-[#FFF3E0] font-bold text-base">🏢 חצר בניין</button>
+              <button type="button" onclick="setSpotPreset('🅿️','חניון שקט')" class="py-2.5 px-2 rounded-xl bg-[#FFF3E0] font-bold text-base">🅿️ חניון שקט</button>
+              <button type="button" onclick="setSpotPreset('🏡','ליד הבית')" class="py-2.5 px-2 rounded-xl bg-[#FFF3E0] font-bold text-base">🏡 ליד הבית</button>
+            </div>
+            <input id="newSpotName" type="text" value="גינה ציבורית" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+            <input id="newSpotIcon" type="hidden" value="🌳" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-base block mb-1">שעת האכלה</label>
+              <input id="newSpotTime" type="time" value="18:00" class="w-full p-3 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+            </div>
+            <div>
+              <label class="font-bold text-base block mb-1">כוסות יבש</label>
+              <input id="newSpotCups" type="number" step="0.5" value="2" class="w-full p-3 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+            </div>
+          </div>
+
+          <div>
+            <label class="font-bold text-base block mb-1">שימורים / פאוצ׳ים</label>
+            <input id="newSpotCans" type="number" value="1" class="w-full p-3 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          </div>
+
+          <div>
+            <label class="font-bold text-base block mb-1">הערה מיוחדת (אופציונלי)</label>
+            <input id="newSpotNote" type="text" placeholder="למשל: להניח ליד הגדר הירוקה" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          </div>
+
+          <button onclick="saveNewSpot()" class="btn-touch w-full bg-[#F29F67] text-white text-xl mt-2">✅ שמור מקום</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">ביטול</button>
+        </div>
+      `);
+    }
+
+    function setSpotPreset(icon, name) {
+      document.getElementById('newSpotIcon').value = icon;
+      document.getElementById('newSpotName').value = name;
+    }
+
+    function saveNewSpot() {
+      const city = document.getElementById('newSpotCity').value.trim() || 'נתניה';
+      const name = document.getElementById('newSpotName').value.trim() || 'תחנת האכלה';
+      const icon = document.getElementById('newSpotIcon').value || '🐾';
+      const time = document.getElementById('newSpotTime').value || '18:00';
+      const dryCups = parseFloat(document.getElementById('newSpotCups').value) || 2;
+      const cans = parseInt(document.getElementById('newSpotCans').value) || 0;
+      const note = document.getElementById('newSpotNote').value.trim();
+
+      state.spots.push({
+        id: Date.now(),
+        city, name, icon, time,
+        days: 'כל יום',
+        dryCups, cans,
+        fedToday: false,
+        note,
+        isDemo: false
+      });
+      closeModal();
+      saveState();
+      render();
+      showToast(`המקום "${name}" נוסף בהצלחה! 🐾`);
+    }
+
+    function openEditSpotModal(id) {
+      const spot = state.spots.find(s => s.id === id);
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">⚙️ עריכת מקום</h3>
+        <div class="flex flex-col gap-3">
+          <label class="font-bold text-base">שם המקום</label>
+          <input id="editSpotName" type="text" value="${spot.name}" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <label class="font-bold text-base">שעת האכלה</label>
+          <input id="editSpotTime" type="time" value="${spot.time}" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-base">כוסות יבש</label>
+              <input id="editSpotCups" type="number" step="0.5" value="${spot.dryCups}" class="w-full p-3 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+            </div>
+            <div>
+              <label class="font-bold text-base">שימורים</label>
+              <input id="editSpotCans" type="number" value="${spot.cans}" class="w-full p-3 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+            </div>
+          </div>
+          <label class="font-bold text-base">הערה</label>
+          <input id="editSpotNote" type="text" value="${spot.note || ''}" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <button onclick="saveEditSpot(${id})" class="btn-touch w-full bg-[#F29F67] text-white text-xl mt-2">💾 שמור שינויים</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">ביטול</button>
+        </div>
+      `);
+    }
+
+    function saveEditSpot(id) {
+      const spot = state.spots.find(s => s.id === id);
+      spot.name = document.getElementById('editSpotName').value.trim() || spot.name;
+      spot.time = document.getElementById('editSpotTime').value || spot.time;
+      spot.dryCups = parseFloat(document.getElementById('editSpotCups').value) || 0;
+      spot.cans = parseInt(document.getElementById('editSpotCans').value) || 0;
+      spot.note = document.getElementById('editSpotNote').value.trim();
+      closeModal();
+      saveState();
+      render();
+      showToast('השינויים נשמרו! ✅');
+    }
+
+    function deleteSpot(id) {
+      state.spots = state.spots.filter(s => s.id !== id);
+      saveState();
+      render();
+      showToast('המקום נמחק');
+    }
+
+    function speakSpot(id) {
+      const s = state.spots.find(x => x.id === id);
+      if (s) speakText(`${s.name} ב${s.city}, שעה ${s.time}. יש לשים ${s.dryCups} כוסות אוכל יבש ו-${s.cans} שימורים. ${s.note}`);
+    }
+
+    function triggerReminderDemo(id) {
+      const s = state.spots.find(x => x.id === id);
+      if (!s) return;
+      playMeow();
+      openModalContent(`
+        <div class="text-center flex flex-col gap-3">
+          <div class="text-5xl">🔔🐱</div>
+          <h3 class="text-2xl font-extrabold">תזכורת האכלה!</h3>
+          <p class="text-xl font-bold text-[#D84315]">${s.city} - ${s.name}</p>
+          <p class="text-lg">השעה ${s.time} • מנה קבועה: ${s.dryCups} כוסות + ${s.cans} שימורים</p>
+          <button onclick="speakSpot(${s.id})" class="btn-touch w-full bg-[#FCE4EC] text-[#880E4F] text-lg">🗣️ הקרא תזכורת בקול</button>
+          <button onclick="toggleFeedSpot(${s.id}); closeModal();" class="btn-touch w-full bg-[#F29F67] text-white text-xl">🐾 דווח שהאכלתי עכשיו</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">נודניק 15 דקות</button>
+        </div>
+      `);
+    }
+
+    function quickAddReminder(title, when, note) {
+      state.reminders.unshift({
+        id: Date.now(),
+        title, when, note,
+        done: false,
+        icon: '⏰',
+        isDemo: false
+      });
+      saveState();
+      render();
+      showToast('התזכורת נוספה! ⏰');
+    }
+
+    function openCustomReminderModal() {
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">➕ תזכורת חדשה</h3>
+        <div class="flex flex-col gap-3">
+          <label class="font-bold text-base">מה צריך לזכור?</label>
+          <input id="remTitle" type="text" placeholder="למשל: לחסן את ג׳ינג׳י" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <label class="font-bold text-base">מתי?</label>
+          <input id="remWhen" type="text" value="מחר • 10:00" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <label class="font-bold text-base">הערה</label>
+          <input id="remNote" type="text" placeholder="פרטים נוספים..." class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+          <button onclick="saveCustomReminder()" class="btn-touch w-full bg-[#F29F67] text-white text-xl mt-2">✅ שמור תזכורת</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">ביטול</button>
+        </div>
+      `);
+    }
+
+    function saveCustomReminder() {
+      const title = document.getElementById('remTitle').value.trim();
+      if (!title) return;
+      quickAddReminder(title, document.getElementById('remWhen').value.trim() || 'היום', document.getElementById('remNote').value.trim());
+      closeModal();
+    }
+
+    function toggleReminder(id) {
+      const r = state.reminders.find(x => x.id === id);
+      if (r) r.done = !r.done;
+      saveState();
+      render();
+    }
+
+    function deleteReminder(id) {
+      state.reminders = state.reminders.filter(x => x.id !== id);
+      saveState();
+      render();
+    }
+
+    let tempCatPhoto = '';
+    function openAddCatModal() {
+      tempCatPhoto = '';
+      const spotOptions = state.spots.map(s => `<option value="${s.name}">${s.city} - ${s.name}</option>`).join('');
+      const tagOptions = [
+        '✂️ אוזן קטומה (מעוקר)',
+        '⚠️ דורש עיקור',
+        '😻 חברותי ומתלטף',
+        '👀 חששן / מרחוק',
+        '🍼 גור צעיר',
+        '👴 חתול מבוגר',
+        '💊 מקבל תרופה'
+      ];
+
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">🐱 הוספת חתול חדש</h3>
+        <div class="flex flex-col gap-3">
+          <label class="btn-touch w-full bg-[#FCE4EC] border-2 border-dashed border-[#F48FB1] text-[#880E4F] text-lg cursor-pointer">
+            <span>📸 צלם חתול בטלפון או בחר תמונה</span>
+            <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewNewCatPhoto(event)" />
+          </label>
+          <img id="newCatPreview" class="hidden w-28 h-28 rounded-2xl object-cover mx-auto border-2 border-[#F29F67]" />
+
+          <label class="font-bold text-base">שם / כינוי החתול</label>
+          <input id="newCatName" type="text" placeholder="למשל: כתם, שלג, נמר..." class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+
+          <label class="font-bold text-base">באיזו תחנה הוא נמצא?</label>
+          <select id="newCatSpot" class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white">
+            ${spotOptions || '<option value="תחנה קבועה">תחנה קבועה</option>'}
+          </select>
+
+          <label class="font-bold text-base">מאפיינים (סמני בלחיצה):</label>
+          <div class="flex flex-wrap gap-2" id="catTagsSelector">
+            ${tagOptions.map(t => `
+              <label class="px-3 py-2 rounded-xl bg-[#FFF3E0] border border-[#FFCC80] font-bold text-sm flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" value="${t}" class="w-4 h-4 accent-[#F29F67]" />
+                <span>${t}</span>
+              </label>
+            `).join('')}
+          </div>
+
+          <label class="font-bold text-base">הערה אישית</label>
+          <input id="newCatNote" type="text" placeholder="סימנים מזהים, אוכל מועדף..." class="w-full p-3.5 rounded-2xl border-2 border-[#FDE8D7] text-lg bg-white" />
+
+          <button onclick="saveNewCat()" class="btn-touch w-full bg-[#F29F67] text-white text-xl mt-2">✅ שמור כרטיס חתול</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">ביטול</button>
+        </div>
+      `);
+    }
+
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 320;
+          const scale = Math.min(1, maxW / img.width);
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          callback(canvas.toDataURL('image/jpeg', 0.72));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewNewCatPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      compressImage(file, dataUrl => {
+        tempCatPhoto = dataUrl;
+        const img = document.getElementById('newCatPreview');
+        img.src = dataUrl;
+        img.classList.remove('hidden');
+      });
+    }
+
+    function handleCatPhotoUpload(event, catId) {
+      const file = event.target.files[0];
+      if (!file) return;
+      compressImage(file, dataUrl => {
+        const cat = state.cats.find(c => c.id === catId);
+        if (cat) {
+          cat.photo = dataUrl;
+          saveState();
+          render();
+          showToast('התמונה נשמרה בכרטיס החתול! 📸');
+        }
+      });
+    }
+
+    function saveNewCat() {
+      const name = document.getElementById('newCatName').value.trim() || 'חתול מתוק';
+      const spotName = document.getElementById('newCatSpot').value;
+      const note = document.getElementById('newCatNote').value.trim();
+      const tags = Array.from(document.querySelectorAll('#catTagsSelector input:checked')).map(el => el.value);
+
+      state.cats.unshift({
+        id: Date.now(),
+        name, spotName, note, tags,
+        photo: tempCatPhoto,
+        emoji: '🐱',
+        isDemo: false
+      });
+      closeModal();
+      saveState();
+      render();
+      showToast(`כרטיס החתול של ${name} נשמר! 🐱`);
+    }
+
+    function deleteCat(id) {
+      state.cats = state.cats.filter(c => c.id !== id);
+      saveState();
+      render();
+    }
+
+    function addDryBag(kg) {
+      state.inventory.dryKg += kg;
+      saveState();
+      render();
+      showToast(`נוספו ${kg} ק״ג למלאי! 🛍️`);
+    }
+
+    function addCans(count) {
+      state.inventory.cans += count;
+      saveState();
+      render();
+      showToast(`נוספו ${count} שימורים למלאי! 🥫`);
+    }
+
+    function showVetAdvice(title, text) {
+      const box = document.getElementById('vetAdviceBox');
+      box.innerHTML = `<strong class="block text-lg mb-1">${title}:</strong><span>${text}</span>`;
+      box.classList.remove('hidden');
+    }
+
+    function addHappyMoment() {
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-3">✨ רגע שמח מהיום</h3>
+        <textarea id="happyText" rows="3" placeholder="כתבי רגע מרגש עם החתולים..." class="w-full p-3.5 rounded-2xl border-2 border-[#F7B7C8] text-lg bg-white mb-3"></textarea>
+        <button onclick="saveHappyMoment()" class="btn-touch w-full bg-[#F48FB1] text-white text-xl">💖 שמור ליומן</button>
+        <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base mt-2">ביטול</button>
+      `);
+    }
+
+    function saveHappyMoment() {
+      const txt = document.getElementById('happyText').value.trim();
+      if (txt) {
+        state.happyMoments.unshift(txt + ' 🐾');
+        saveState();
+        render();
+      }
+      closeModal();
+    }
+
+    function openSitterShare() {
+      let msg = `היי! 🐾 הנה רשימת ההאכלה של החתולים של סמדר:
+
+`;
+      state.spots.forEach((s, i) => {
+        msg += `${i + 1}. *${s.city} - ${s.name}* (שעה ${s.time})
+   🥣 ${s.dryCups} כוסות יבש + ${s.cans} שימורים
+   ${s.note ? '📝 ' + s.note + '
+' : ''}
+`;
+      });
+      msg += `תודה ענקית על העזרה! ❤️🐱`;
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+      openModalContent(`
+        <h3 class="text-2xl font-extrabold mb-2">💬 שליחת הוראות למחליפה</h3>
+        <p class="text-base mb-3">הודעה מוכנה עם כל המקומות, השעות וכמויות האוכל המדויקות:</p>
+        <pre class="p-3.5 rounded-2xl bg-white border border-[#FDE8D7] text-sm whitespace-pre-wrap font-sans mb-4 max-h-48 overflow-y-auto">${msg}</pre>
+        <a href="${waUrl}" target="_blank" class="btn-touch w-full bg-[#25D366] text-white text-lg no-underline mb-2">
+          📲 שלח עכשיו ב-WhatsApp
+        </a>
+        <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">סגור</button>
+      `);
+    }
+
+    function openGuideModal() {
+      const guides = {
+        feeding: 'במסך ההאכלה רואים את כל המקומות לפי ערים. לחצי על הכפתור הכתום "האכלתי!" ברגע ששמת אוכל – האפליקציה תסמן שבוצע ותוריד אוטומטית מהמלאי בבית.',
+        reminders: 'במסך התזכורות תוכלי לבחור תזכורת מוכנה בלחיצה (עיקור, וטרינר, תרופה) או להוסיף תזכורת משלך.',
+        cats: 'במסך החתולים תוכלי לצלם כל חתול בטלפון ולסמן בלחיצה אם יש לו אוזן קטומה (מעוקר) או מאפיינים מיוחדים.',
+        inventory: 'במסך המלאי תראי כמה ימים יספיק השק בבית, ותוכלי לעדכן בלחיצה כשקונים שק או ארגז שימורים חדש.',
+        vet: 'במסך היועץ יש חיוג מהיר לחירום, בדיקת תסמינים בשטח ופינת רגעים שמחים.'
+      };
+      const text = guides[state.activeTab] || guides.feeding;
+      openModalContent(`
+        <div class="flex flex-col gap-3">
+          <h3 class="text-2xl font-extrabold">🐾 מדריך מהיר למסך</h3>
+          <p class="text-lg leading-relaxed">${text}</p>
+          <button onclick="speakText('${text}')" class="btn-touch w-full bg-[#FCE4EC] text-[#880E4F] text-lg">🗣️ הקרא הסבר בקול</button>
+          <button onclick="closeModal()" class="btn-touch w-full bg-[#F29F67] text-white text-lg">הבנתי, תודה!</button>
+        </div>
+      `);
+    }
+
+    function clearDemoData() {
+      state.spots = state.spots.filter(s => !s.isDemo);
+      state.cats = state.cats.filter(c => !c.isDemo);
+      state.reminders = state.reminders.filter(r => !r.isDemo);
+      saveState();
+      render();
+      showToast('כל נתוני הדוגמה נוקו! אפשר להזין נתונים אמיתיים 🧹');
+    }
+
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'smadar_cats_backup.json';
+      a.click();
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          state = { ...defaultState, ...JSON.parse(e.target.result) };
+          saveState();
+          render();
+          closeModal();
+          showToast('הגיבוי שוחזר בהצלחה! ✅');
+        } catch (err) {
+          showToast('קובץ גיבוי לא תקין');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function openModal(type) {
+      if (type === 'installModal') {
+        openModalContent(`
+          <div class="flex flex-col gap-3">
+            <h3 class="text-2xl font-extrabold">📲 התקנה כאפליקציה בנייד</h3>
+            <p class="text-base">אפשר להתקין את <strong>"החתולים של סמדר"</strong> ישירות על מסך הבית בטלפון (ללא צורך בחנות אפליקציות):</p>
+            <div class="p-3.5 rounded-2xl bg-[#FFF3E0] border border-[#FFCC80] text-base">
+              <strong>באנדרואיד (Chrome):</strong><br/>
+              לחצי על 3 הנקודות למעלה משמאל ← בחרי <strong>"הוסף למסך הבית"</strong> או <strong>"התקן אפליקציה"</strong>.
+            </div>
+            <div class="p-3.5 rounded-2xl bg-[#FCE4EC] border border-[#F7B7C8] text-base">
+              <strong>באייפון (Safari):</strong><br/>
+              לחצי על כפתור השיתוף למטה (ריבוע עם חץ למעלה) ← בחרי <strong>"הוסף למסך הבית"</strong>.
+            </div>
+            <button onclick="closeModal()" class="btn-touch w-full bg-[#F29F67] text-white text-lg mt-1">סגור</button>
+          </div>
+        `);
+      } else if (type === 'backupModal') {
+        openModalContent(`
+          <div class="flex flex-col gap-3">
+            <h3 class="text-2xl font-extrabold">💾 גיבוי ושחזור נתונים</h3>
+            <p class="text-base">שמרי קובץ גיבוי הכולל את כל המקומות, החתולים והתמונות, או טעני גיבוי קיים:</p>
+            <button onclick="exportBackup()" class="btn-touch w-full bg-[#F29F67] text-white text-lg">⬇️ הורד קובץ גיבוי</button>
+            <label class="btn-touch w-full bg-[#FFF3E0] border-2 border-[#F29F67] text-[#4E342E] text-lg cursor-pointer">
+              <span>⬆️ שחזר מקובץ גיבוי</span>
+              <input type="file" accept=".json" class="hidden" onchange="importBackup(event)" />
+            </label>
+            <hr class="border-[#FDE8D7] my-1" />
+            <button onclick="clearDemoData(); closeModal();" class="btn-touch w-full bg-[#FFEBEE] text-[#C62828] text-base">🧹 מחק את כל נתוני הדוגמה והתחל נקי</button>
+            <button onclick="closeModal()" class="btn-touch w-full bg-white border border-gray-300 text-base">סגור</button>
+          </div>
+        `);
+      }
+    }
+
+    function openModalContent(html) {
+      const container = document.getElementById('modalContainer');
+      document.getElementById('modalBody').innerHTML = html;
+      container.classList.remove('hidden');
+      container.classList.add('flex');
+    }
+
+    function closeModal() {
+      const container = document.getElementById('modalContainer');
+      container.classList.add('hidden');
+      container.classList.remove('flex');
+    }
+
+    document.getElementById('modalContainer').addEventListener('click', e => {
+      if (e.target.id === 'modalContainer') closeModal();
+    });
+
+    render();
+  </script>
+</body>
+</html>
